@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Obtener Conversación</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Obtener Conversación</h2>
+  <form id="obtenerConversacionForm">
+    <input type="text" id="token" placeholder="Token JWT" required />
+    <input type="text" id="conversationId" placeholder="ID de la conversación" required />
+    <button type="submit">Obtener Datos</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('obtenerConversacionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const data = {
+        token: document.getElementById('token').value,
+        conversationId: document.getElementById('conversationId').value
+      };
+
+      socket.emit('obtener_conversacion', data);
+    });
+
+    socket.on('conversacion_obtenida', (data) => {
+      document.getElementById('output').textContent = 'Conversación:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('obtener_conversacion_error', (err) => {
+      document.getElementById('output').textContent = 'Error:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>

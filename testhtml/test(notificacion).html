@@ -1,0 +1,54 @@
+
+<!-- ESTE TEST SOLO SE USA CUANDO NO SE TRABAJA CON BACKEN SOLO ERA PARA UNA PRUEBA DE LAS NOTIFICACIONES 
+ HACIA LOS USUARIOS EN UN MISMO CHAT DE UN ROOM
+ Aun se puede usar pero no hace contacto con nada
+ pueden usarlo abren en dos pestañas el html y en las dos se ponen un id de usuario distinto y se puede chatear
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChiwiChat Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>ChiwiChat pro con madre interfaz</h1>
+  <input type="text" id="roomId" placeholder="Room ID">
+  <input type="text" id="userId" placeholder="Tu ID">
+  <button onclick="joinRoom()">Unirme a la sala</button>
+
+  <hr>
+
+  <input type="text" id="msg" placeholder="Mensaje">
+  <button onclick="sendMsg()">Enviar mensaje</button>
+
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    function joinRoom() {
+      const roomId = document.getElementById('roomId').value;
+      const userId = document.getElementById('userId').value;
+      socket.emit('join_private_room', { roomId, userId });
+    }
+
+    function sendMsg() {
+      const roomId = document.getElementById('roomId').value;
+      const content = document.getElementById('msg').value;
+      const senderId = document.getElementById('userId').value;
+
+      socket.emit('send_private_message', {
+        roomId,
+        senderId,
+        content
+      });
+    }
+
+    socket.on('receive_private_message', (data) => {
+      const li = document.createElement('li');
+      li.textContent = `[${data.senderId}] ${data.content}`;
+      document.getElementById('messages').appendChild(li);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  chiwichat-socket:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chiwichat_socket
+    ports:
+      - "3000:3000"
+    networks:
+      - chiwi_network  
+
+networks:
+  chiwi_network:
+    external: true     

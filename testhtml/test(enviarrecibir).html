@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Receptor en Tiempo Real</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Escuchar Mensajes</h2>
+  <form id="escucharForm">
+    <input type="text" id="token" placeholder="Token JWT" required />
+    <button type="submit">Escuchar mensajes</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('escucharForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const token = document.getElementById('token').value;
+      socket.emit('escuchar_mensajes', { token });
+    });
+
+    socket.on('mensaje_recibido', (data) => {
+      const salida = document.getElementById('output');
+      salida.textContent += 'Nuevo mensaje:\n' + JSON.stringify(data, null, 2) + '\n';
+    });
+
+    socket.on('error_escuchar_mensajes', (err) => {
+      document.getElementById('output').textContent = 'Error:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>

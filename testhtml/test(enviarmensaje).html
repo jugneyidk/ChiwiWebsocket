@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar Mensaje</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Enviar Mensaje</h2>
+  <form id="enviarMensajeForm">
+    <input type="text" id="conversationId" placeholder="ID de la conversación" required />
+    <input type="text" id="content" placeholder="Mensaje encriptado" required />
+    <input type="text" id="token" placeholder="Token JWT" required />
+    <button type="submit">Enviar</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('enviarMensajeForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const conversationId = document.getElementById('conversationId').value;
+      const content = document.getElementById('content').value;
+      const token = document.getElementById('token').value;
+
+      socket.emit('enviar_mensaje', { conversationId, content, token });
+    });
+
+    socket.on('mensaje_enviado', (data) => {
+      document.getElementById('output').textContent = 'Mensaje enviado:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('error_enviar_mensaje', (err) => {
+      document.getElementById('output').textContent = 'Error:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>

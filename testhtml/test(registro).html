@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Registro de Usuario</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Registrar Usuario</h2>
+  <form id="registerForm">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="text" id="apellido" placeholder="Apellido" required>
+    <input type="text" id="email" placeholder="Correo electrónico" required>
+    <input type="text" id="username" placeholder="Nombre de usuario" required>
+    <button type="submit">Registrar</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const data = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value
+      };
+
+      socket.emit('registrar_usuario', data);
+    });
+
+    socket.on('registro_exitoso', (data) => {
+      document.getElementById('output').textContent = 'Registro exitoso:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('registro_error', (err) => {
+      document.getElementById('output').textContent = 'Error en registro:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>

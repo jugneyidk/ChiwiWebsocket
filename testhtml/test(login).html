@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Login y Obtener Usuario</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input type="text" id="username" placeholder="Nombre de usuario" required />
+    <button type="submit">Iniciar sesión</button>
+  </form>
+
+  <h2>Usuario actual</h2>
+  <button id="getUserBtn">Obtener usuario</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+    let token = null;
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+
+      socket.emit('login_usuario', { username });
+    });
+
+    socket.on('login_exitoso', (data) => {
+  token = data.accessToken;
+  document.getElementById('output').textContent = 'Token guardado: ' + token;
+});
+
+    socket.on('login_error', (err) => {
+      document.getElementById('output').textContent = 'Error en login: ' + JSON.stringify(err);
+    });
+
+    document.getElementById('getUserBtn').addEventListener('click', () => {
+      if (!token) {
+        alert('Primero debes iniciar sesión');
+        return;
+      }
+      socket.emit('obtener_usuario', { token });
+    });
+
+    socket.on('usuario_obtenido', (data) => {
+      document.getElementById('output').textContent = 'Usuario:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('obtener_usuario_error', (err) => {
+      document.getElementById('output').textContent = 'Error al obtener usuario:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>
