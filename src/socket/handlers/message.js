@@ -14,11 +14,7 @@ module.exports = (io, socket) => {
       const emisorId = data.userId;
       const mensaje = data;
       delete mensaje.token;
-      io.emit(`nuevo_mensaje_${receptorId}`, {
-        message: mensaje,
-        conversationId: data.conversationId,
-        from: emisorId
-      });
+      io.emit(`nuevo_mensaje_${receptorId}`, res.content);
 
     } catch (error) {
       socket.emit('mensaje_error', error.response?.data || { error: 'Error al enviar mensaje' });
