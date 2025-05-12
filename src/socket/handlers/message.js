@@ -9,12 +9,8 @@ module.exports = (io, socket) => {
       });
 
       socket.emit('mensaje_enviado', res.data);
-
       const receptorId = data.receiverId;
-      const emisorId = data.userId;
-      const mensaje = data;
-      delete mensaje.token;
-      io.emit(`nuevo_mensaje_${receptorId}`, res.content);
+      io.emit(`nuevo_mensaje_${receptorId}`, res.data.content);
 
     } catch (error) {
       socket.emit('mensaje_error', error.response?.data || { error: 'Error al enviar mensaje' });
@@ -61,9 +57,12 @@ module.exports = (io, socket) => {
         headers: { Authorization: `Bearer ${data.token}` }
       });
       socket.emit('conversacion_creada', res.data);
-
+      
       const receptorId = data.userId;
       io.emit(`nueva_conversacion_${receptorId}`, res.data);
+
+      if ('initialMessage' in res.data)
+        io.emit(`nuevo_mensaje_${receptorId}`, res.data.initialMessage);
       
     } catch (error) {
       socket.emit('crear_conversacion_error', error.response?.data || { error: 'Error al crear conversación' });
