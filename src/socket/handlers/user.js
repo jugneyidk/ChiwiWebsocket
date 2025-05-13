@@ -40,4 +40,15 @@ module.exports = (io, socket) => {
       socket.emit('obtener_usuario_error', error.response?.data || { error: 'Error al obtener usuario' });
     }
   });
+
+  socket.on('buscar_usuario', async (data) => {
+    try {
+      const res = await axios.get(`http://usuarios-service:80/users/${data.userId}` , {
+        headers: { Authorization: `Bearer ${data.token}` }
+      });
+      socket.emit('usuarios_obtenido', res.data);
+    } catch (error) {
+      socket.emit('buscar_usuario_error', error.response?.data || { error: 'Error al buscar usuarios' });
+    }
+  });
 };

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Mensajes Tiempo Real</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Enviar Mensaje</h2>
+  <form id="sendMessageForm">
+    <input type="text" id="conversationId" placeholder="ID de conversación" required />
+    <input type="text" id="userId" placeholder="Tu ID de usuario" required />
+    <input type="text" id="receiverId" placeholder="ID receptor" required />
+    <input type="text" id="token" placeholder="Token JWT" required />
+    <input type="text" id="content" placeholder="Mensaje" required />
+    <button type="submit">Enviar Mensaje</button>
+  </form>
+
+  <h2>Mensajes Recibidos en Tiempo Real</h2>
+  <pre id="receivedMessages"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('sendMessageForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const conversationId = document.getElementById('conversationId').value;
+      const userId = document.getElementById('userId').value;
+      const receiverId = document.getElementById('receiverId').value;
+      const token = document.getElementById('token').value;
+      const content = document.getElementById('content').value;
+
+      socket.emit('enviar_mensaje', { conversationId, userId, receiverId, token, content });
+    });
+
+    const myUserId = prompt('Introduce tu ID de usuario para escuchar mensajes:');
+
+    socket.on(`nuevo_mensaje_${myUserId}`, (data) => {
+      const output = document.getElementById('receivedMessages');
+      output.textContent += `Nuevo mensaje recibido de ${data.from}:\n${JSON.stringify(data.message, null, 2)}\n\n`;
+    });
+
+    socket.on('mensaje_enviado', (data) => {
+      console.log('Mensaje enviado correctamente:', data);
+    });
+
+    socket.on('mensaje_error', (error) => {
+      console.error('Error al enviar mensaje:', error);
+    });
+  </script>
+</body>
+</html>
