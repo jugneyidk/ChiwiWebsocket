@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear y Escuchar Nueva Conversación</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Identifícate para Escuchar Conversaciones</h2>
+
+  <form id="identificarUsuarioForm">
+    <input type="number" id="miUserId" placeholder="Tu ID de usuario" required />
+    <button type="submit">Identificar</button>
+  </form>
+
+  <h2>Crear nueva conversación</h2>
+  
+  <form id="crearConversacionForm">
+    <input type="number" id="userId" placeholder="ID del usuario destino" required />
+    <input type="text" id="username" placeholder="Username del usuario destino" required />
+    <input type="text" id="token" placeholder="Tu token JWT" required />
+    <button type="submit">Crear Conversación</button>
+  </form>
+
+  <h2>Eventos Recibidos</h2>
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+    let miUserId = null;
+
+    document.getElementById('identificarUsuarioForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      miUserId = parseInt(document.getElementById('miUserId').value);
+      alert('Te has identificado como usuario ID: ' + miUserId);
+    });
+
+    document.getElementById('crearConversacionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const userId = parseInt(document.getElementById('userId').value);
+      const username = document.getElementById('username').value;
+      const token = document.getElementById('token').value;
+
+      socket.emit('crear_conversacion', { userId, username, token });
+    });
+
+    socket.on('nueva_conversacion', (data) => {
+      document.getElementById('output').textContent = 'Nueva conversación recibida:\n' + JSON.stringify(data, null, 2);
+
+      if (miUserId !== null) {
+        if (data.user1Id === miUserId || data.user2Id === miUserId) {
+          alert('¡Se ha creado una conversación que te involucra!');
+        }
+      }
+    });
+
+    socket.on('conversacion_creada', (data) => {
+      document.getElementById('output').textContent = 'Conversación creada exitosamente:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('crear_conversacion_error', (err) => {
+      document.getElementById('output').textContent = 'Error al crear conversación:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>

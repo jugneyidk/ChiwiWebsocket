@@ -29,7 +29,7 @@
     });
 
     socket.on('login_exitoso', (data) => {
-  token = data.accessToken;
+  token = data.token;
   document.getElementById('output').textContent = 'Token guardado: ' + token;
 });
 

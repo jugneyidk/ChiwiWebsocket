@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscar usuario</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Buscar usuario</h2>
+  <form id="crearConversacionForm">
+    <input type="text" id="userId" placeholder="Username o email" required />
+    <input type="text" id="token" placeholder="Token JWT" required />
+    <button type="submit">Crear</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    document.getElementById('crearConversacionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const userId = document.getElementById('userId').value;
+      const token = document.getElementById('token').value;
+      console.log(1);
+      socket.emit('buscar_usuario', {userId, token} );
+      console.log(2);
+    });
+
+    socket.on('usuarios_obtenido', (data) => {
+      document.getElementById('output').textContent = 'usuarios encontrados:\n' + JSON.stringify(data, null, 2);
+    });
+
+    socket.on('buscar_usuario_error', (err) => {
+      document.getElementById('output').textContent = 'Error:\n' + JSON.stringify(err, null, 2);
+    });
+  </script>
+</body>
+</html>
