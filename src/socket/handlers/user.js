@@ -13,6 +13,8 @@ module.exports = (io, socket) => {
   socket.on('login_usuario', async (data) => {
     try {
       const res = await axios.post('http://usuarios-service:80/login', data);
+      const userId = res.data.userId;
+      socket.join(`user_${userId}`); // El usuario se une a su sala privada
       socket.emit('login_exitoso', res.data);
     } catch (error) {
       socket.emit('login_error', error.response?.data || { error: 'Error al iniciar sesión' });
