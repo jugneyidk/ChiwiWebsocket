@@ -57,7 +57,7 @@ module.exports = (io, socket) => {
         headers: { Authorization: `Bearer ${data.token}` }
       });
       socket.emit('conversacion_creada', res.data);
-console.log(res.data.initialMessage);
+      
       const receptorId = data.userId;
       io.emit(`nueva_conversacion_${receptorId}`, res.data);
 
